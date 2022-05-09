@@ -1,5 +1,5 @@
-import {keyboardEng} from '../../modules/letterEng.js'
-import {keyboardRus} from '../../modules/letterRus.js'
+import {keyboardEng} from '../modules/letterEng.js'
+import {keyboardRus} from '../modules/letterRus.js'
 
 let div = document.createElement('div');
 let textarea = document.createElement('textarea');
