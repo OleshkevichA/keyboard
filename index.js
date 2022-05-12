@@ -176,7 +176,7 @@ div.addEventListener('mouseup', function(event){
 
 function runOnKeys(func, ...codes) {
   let pressed = new Set();
-
+  
   document.addEventListener('keydown', function(event) {
     pressed.add(event.code);
 
@@ -188,7 +188,7 @@ function runOnKeys(func, ...codes) {
     pressed.clear();
     func();
   });
-  
+  console.log();
   document.addEventListener('keyup', function(event) {
     pressed.delete(event.code);
   });
