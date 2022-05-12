@@ -10,7 +10,7 @@ legend.classList.add('legend');
 document.body.append(textarea);
 document.body.append(div);
 document.body.append(legend);
-//textarea.setAttribute('readonly', true);
+
 
 
 
@@ -21,7 +21,7 @@ legend.textContent = 'Переключение языка LeftShift + LeftAlt';
 window.addEventListener('beforeunload', setLocalStorage);
 
 
-function init(lang){
+function init(lang, index = 0){
   let out = "";
   if (lang == 'eng'){
     for (let i = 0; i < keyboardEng.length; i++){
@@ -29,7 +29,7 @@ function init(lang){
      out += `<div class="btn ${keyboardEng[i].code}"><span>${keyboardEng[i].key[1]}</span>${keyboardEng[i].key[0]}</div>`; 
      }
      else if (i > 13 && i < 25 || i > 27 && i < 39 || i > 43 && i < 51){
-      out += `<div class="btn ${keyboardEng[i].code}">${keyboardEng[i].key[1]}</div>`;   
+      out += `<div class="btn ${keyboardEng[i].code}">${keyboardEng[i].key[index]}</div>`;   
       }
       else
       out += `<div class="btn ${keyboardEng[i].code}">${keyboardEng[i].key[0]}</div>`;
@@ -38,13 +38,13 @@ function init(lang){
   else if (lang == 'rus'){
     for (let i = 0; i < keyboardRus.length; i++){
       if (i == 0){
-        out += `<div class="btn ${keyboardRus[i].code}"><span>${keyboardRus[i].key[0]}</span>${keyboardRus[i].key[1]}</div>`;
+        out += `<div class="btn ${keyboardRus[i].code}"><span>${keyboardRus[i].key[`${index == 0? 1 : 0}`]}</span>${keyboardRus[i].key[index]}</div>`;
       }
       else if (i < 13 || i == 27 || i == 53){
       out += `<div class="btn ${keyboardRus[i].code}"><span>${keyboardRus[i].key[1]}</span>${keyboardRus[i].key[0]}</div>`; 
       }
       else if (i > 13 && i < 27 || i > 27 && i < 41 || i > 43 && i < 53){
-       out += `<div class="btn ${keyboardRus[i].code}">${keyboardRus[i].key[1]}</div>`;   
+       out += `<div class="btn ${keyboardRus[i].code}">${keyboardRus[i].key[index]}</div>`;   
        }
        else
        out += `<div class="btn ${keyboardRus[i].code}">${keyboardRus[i].key[0]}</div>`;
@@ -81,6 +81,8 @@ document.onkeydown = function(event) {
       addText(event.code);
 
       if (event.code == 'CapsLock'){
+        caps? init(language, 0) : init(language, 1);
+        document.querySelector(`.${event.code}`).classList.add('active');
         caps = (!caps);
       }
       setTimeout(() => {
@@ -88,7 +90,7 @@ document.onkeydown = function(event) {
       }, 500)
     }
   }
-        
+    
 }
 
 function addText(code){
@@ -138,14 +140,38 @@ div.addEventListener('click', function(event){
     addText(event.target.classList[1]);
 
     if (event.target.classList[1] == 'CapsLock'){
+      caps? init(language, 0) : init(language, 1);
+      document.querySelector(`.${event.target.classList[1]}`).classList.add('active');
       caps = (!caps);
     }
     
     setTimeout(() => {
       document.querySelector(`.${event.target.classList[1]}`).classList.remove('active')
-    }, 500)
+    }, 500);
   }
 });
+
+div.addEventListener('mousedown', function(event){
+  if (event.target.textContent == 'Shift'){
+    init(language, 1);
+    document.addEventListener('keydown', function(event){
+        if (!caps){
+        init(language, 1)
+        caps = true;
+        addText(event.code);
+        }
+      
+      document.querySelector(`.${event.code}`).classList.add('active')
+  })
+  }
+})
+
+div.addEventListener('mouseup', function(event){
+  if (event.target.textContent == 'Shift'){
+    init(language);
+    caps = false;
+  }
+})
 
 
 function runOnKeys(func, ...codes) {
@@ -168,6 +194,30 @@ function runOnKeys(func, ...codes) {
   });
 }
 
+
+document.addEventListener('keyup', function(event){
+  if (event.key == 'Shift'){
+    init(language, 0);
+    caps = (!caps);
+  }
+})
+
+
+document.addEventListener('keydown', function(event){
+    if (event.key && event.shiftKey){
+      if (!caps){
+      init(language, 1)
+      caps = true;
+      addText(event.code);
+      }
+    }
+    document.querySelector(`.${event.code}`).classList.add('active')
+})
+
+
+
+
+
 runOnKeys( () => {
   if (language == 'eng'){
     language = 'rus';
@@ -187,6 +237,4 @@ runOnKeys( () => {
 );
 
 
-console.log(div);
-let LeftShift = document.querySelector('.ShiftLeft');
-console.log(LeftShift);
+
